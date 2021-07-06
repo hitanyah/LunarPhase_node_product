@@ -6,7 +6,6 @@ const db = require(__dirname + '/modules/mysql2-connent');
 
 // const Product = require('./models/Product');
 
-
 const app = express();
 
 // 樣版引擎 ejs
