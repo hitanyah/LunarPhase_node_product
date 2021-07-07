@@ -49,7 +49,7 @@ app.get('/try-db',(req,res)=>{
 
 // --- PRODUCT
 
-// app.use('/product', require(__dirname + '/routes/product'))
+app.use('/product', require(__dirname + '/routes/product'))
 
 
 
