@@ -4,6 +4,7 @@ const port = process.env.PORT || 3000;
 const express = require('express');
 const db = require(__dirname + '/modules/mysql2-connent');
 
+const cors = require('cors');
 // const Product = require('./models/Product');
 
 const app = express();
@@ -19,10 +20,11 @@ app.use(express.json());
 // 靜態內容資料夾
 app.use(express.static(__dirname + '/../public'));
 
+app.use(cors());
 
 // ----- 路由定義
 
-
+// 測試
 app.get('/',(req,res)=>{
     res.send('hello!');
 })
@@ -32,10 +34,7 @@ app.post('/',(req,res)=>{
 })
 
 
-
-
 // --- try-db
-
 app.get('/try-db',(req,res)=>{
     db.query('SELECT * FROM `items` LIMIT 5')
         .then(([r])=>{
@@ -50,6 +49,7 @@ app.get('/try-db',(req,res)=>{
 // --- PRODUCT
 
 app.use('/product', require(__dirname + '/routes/product'))
+
 
 
 

@@ -1,5 +1,6 @@
 const db = require('../modules/mysql2-connent')
 
+const sqlSelect = "SELECT `items`.`itemId`, `items`.`itemNo` , `items`.`itemName`, `items`.`itemCoverImg`, `items`.`itemImg`, `items`.`itemPrice`, `items`.`itemQty`, `items`.`itemDescription`, `items`.`itemCategoryId`,  `items_categories`.`categoryName`, `cate2`.`categoryId` AS `categoryIdParent`, `cate2`.`categoryName` AS `categoryNameParent`,`items`.`itemFlowId`,`items_flow`.`flowName` ,`items_flow`.`flowImg` , `items`.`itemSize`, `items`.`itemOptionId`, `items_options`.`optionName`,`items`.`itemRanking`,`items`.`created_at`,`items`.`updated_at` FROM `items` INNER JOIN  `items_categories` ON `items`.`itemCategoryId` = `items_categories`.`categoryId` LEFT JOIN `items_categories` AS `cate2` ON `items_categories`.`categoryParentId` = `cate2`.`categoryId` INNER JOIN `items_flow` ON `items`.`itemFlowId` = `items_flow`.`flowId` INNER JOIN `items_options` ON `items`.`itemOptionId` = `items_options`.`optionId`"
 
 class Product{
     // `itemId`, `itemNo`, `itemName`, `itemCoverImg`, `itemImg`, `itemPrice`, `itemQty`, `itemDescription`, `itemCategoryId`, `itemCategoryChildId`, `itemFlowId`, `itemSize`, `itemOptionId`, `itemTagId`, `itemRanking`,`created_at`, `updated_at`
@@ -14,7 +15,6 @@ class Product{
             itemQty: 0,
             itemDescription: '',
             itemCategoryId: 0,
-            itemCategoryChildId: 0,
             itemFlowId: 0, 
             itemSize: '',
             itemOptionId: 0,
@@ -92,20 +92,54 @@ class Product{
         }
         return results;
     }
+
     
-    // 列出全部？？
-   
+    // 讀取所有
+    static async getAllItems(){
+        let sql = 
+        `${sqlSelect} ORDER BY \`items\`.\`itemId\``;
+        let [r] = await db.query(sql);
+        if(!r || !r.length){
+            return null;
+        }
+        return r;
+    }
+    
+
+    
+    // 列出父分類
+    // static async getCatePaItems(categoryIdParent){
+    //     let sql = 
+    //     `${sqlSelect} WHERE \`categoryIdParent\`=? ORDER BY \`items\`.\`itemId\``;
+    //     let [r] = await db.query(sql,[categoryIdParent]);
+    //     if(!r || !r.length){
+    //         return null;
+    //     }
+    //     return r;
+    // }
+    
+    // 列出子分類
+    static async getItemByCate(itemCategoryId){
+        let sql = 
+        `${sqlSelect} WHERE \`itemCategoryId\`=? ORDER BY \`items\`.\`itemId\``;
+        let [r] = await db.query(sql,[itemCategoryId]);
+        if(!r || !r.length){
+            return null;
+        }
+        return r;
+    }
     
     // 讀取單筆
-    static async getRow(itemId){
+    static async getItemById(itemId){
         if(!itemId) return null;
-        let sql = "SELECT * FROM `items` WHERE `itemId`=?";
+        let sql = `${sqlSelect} WHERE \`itemId\`=?`;
         let [r] = await db.query(sql, [itemId]);
         if(!r || !r.length){
             return null;
         }
         return r[0];
     }
+
     static async getItem(itemId) {
         let row = await Product.getRow(itemId);
         return new Product( row );
