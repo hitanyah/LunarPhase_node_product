@@ -96,6 +96,8 @@ class Product{
     
     // 讀取所有
     static async getAllItems(){
+
+        
         let sql = 
         `${sqlSelect} ORDER BY \`items\`.\`itemId\``;
         let [r] = await db.query(sql);
@@ -123,6 +125,16 @@ class Product{
         let sql = 
         `${sqlSelect} WHERE \`itemCategoryId\`=? ORDER BY \`items\`.\`itemId\``;
         let [r] = await db.query(sql,[itemCategoryId]);
+        if(!r || !r.length){
+            return null;
+        }
+        return r;
+    }
+    
+    // 列出流量分類
+    static async getCateFlow(){
+        let sql = "SELECT * FROM `items_flow`"
+        let [r] = await db.query(sql);
         if(!r || !r.length){
             return null;
         }

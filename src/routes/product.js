@@ -36,6 +36,11 @@ router.get('/category/:itemCategoryId', async (req, res)=>{
     res.json([count, p]);
 });
 
+// 取得流量分類
+router.get('/flow', async (req, res)=>{
+    res.json(await Product.getCateFlow());
+});
+
 
 // 取得單項商品
 router.get('/:itemId', async (req, res)=>{
