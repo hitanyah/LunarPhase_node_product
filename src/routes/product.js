@@ -17,26 +17,33 @@ router.get('/all', async (req, res)=>{
     res.json(await Product.getAllItems());
 });
 
+// 取得所有商品
+router.get('/ranking', async (req, res)=>{
+    res.json(await Product.getTopRanking());
+});
 
 
 
-// 取得父分類商品？
-// router.get('/category/:categoryIdParent', async (req, res)=>{
-//     let p = await Product.getCatePaItems(req.params.categoryIdParent)
-//     let count = '篩選數量: '+ p.length
-//     res.json([req.baseUrl, req.url, count, p]);
-// });
+
+// 取得父分類商品
+router.get('/category-p/:categoryIdParent', async (req, res)=>{
+    let p = await Product.getItemByCatePa(req.params.categoryIdParent)
+    // let count = '篩選數量: '+ p.length
+    // res.json([req.baseUrl, req.url, count, p]);
+    res.json(p);
+});
 
 
 // 取得子分類商品
 router.get('/category/:itemCategoryId', async (req, res)=>{
     let p = await Product.getItemByCate(req.params.itemCategoryId)
-    let count = '篩選數量: '+ p.length
+    // let count = '篩選數量: '+ p.length
     // res.json([req.baseUrl, req.url, count, p]);
-    res.json([count, p]);
+    // res.json([count, p]);
+    res.json(p);
 });
 
-// 取得子分類項目
+// 取得父分類選項
 router.get('/category-select/:categoryParentId', async (req, res)=>{
     res.json(await Product.getCate(req.params.categoryParentId));
 });

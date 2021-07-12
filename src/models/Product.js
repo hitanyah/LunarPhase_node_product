@@ -121,16 +121,16 @@ class Product{
     
 
     
-    // 列出父分類
-    // static async getCatePaItems(categoryIdParent){
-    //     let sql = 
-    //     `${sqlSelect} WHERE \`categoryIdParent\`=? ORDER BY \`items\`.\`itemId\``;
-    //     let [r] = await db.query(sql,[categoryIdParent]);
-    //     if(!r || !r.length){
-    //         return null;
-    //     }
-    //     return r;
-    // }
+    //列出父分類
+    static async getItemByCatePa(categoryIdParent){
+        let sql = 
+        `${sqlSelect} WHERE \`cate2\`.\`categoryId\` =? ORDER BY \`items\`.\`itemId\``;
+        let [r] = await db.query(sql,[categoryIdParent]);
+        if(!r || !r.length){
+            return null;
+        }
+        return r;
+    }
     
     // 列出子分類
     static async getItemByCate(itemCategoryId){
@@ -143,6 +143,7 @@ class Product{
         return r;
     }
 
+
     // 列出不同分類？
     static async getCate(categoryParentId){
         let sql = "SELECT `items_categories`.`categoryId`, `items_categories`.`categoryName`, `cate2`.`categoryName` AS `categoryNameParent`  FROM `items_categories`LEFT JOIN `items_categories` AS`cate2`  ON `items_categories`.`categoryParentId` = `cate2`.`categoryId` WHERE `items_categories`.`categoryParentId` =?"
@@ -154,11 +155,6 @@ class Product{
         return r;
     }
 
-
-
-
-
-    
     // 列出流量分類
     static async getCateFlow(){
         let sql = "SELECT * FROM `items_flow`"
@@ -176,6 +172,17 @@ class Product{
         }
         return r;
     }
+
+    // 列出評價高的商品
+    static async getTopRanking(){
+        let sql = "SELECT * FROM `items` WHERE `itemRanking`=5 LIMIT 3"
+        let [r] = await db.query(sql);
+        if(!r || !r.length){
+            return null;
+        }
+        return r;
+    }
+
     
     // 讀取單筆
     static async getItemById(itemId){
