@@ -5,13 +5,13 @@ const Product = require(__dirname + '/../models/Product');
 const router = express.Router();
 
 
-// 取得所有商品 + 篩選 ?
+// 取得所有商品 + 篩選 
 router.get('/', async (req, res)=>{
     // res.json([req.baseUrl, req.url]);
-    res.json(await Product.getRows());
+    res.json(await Product.getRows(req.query));
 });
 
-// 取得所有商品 + 篩選 ?
+// 取得所有商品 全表完整內容
 router.get('/all', async (req, res)=>{
     // res.json([req.baseUrl, req.url]);
     res.json(await Product.getAllItems());
@@ -36,9 +36,17 @@ router.get('/category/:itemCategoryId', async (req, res)=>{
     res.json([count, p]);
 });
 
+// 取得子分類項目
+router.get('/category-select/:categoryParentId', async (req, res)=>{
+    res.json(await Product.getCate(req.params.categoryParentId));
+});
+
 // 取得流量分類
-router.get('/flow', async (req, res)=>{
-    res.json(await Product.getCateFlow());
+router.get('/flow/', async (req, res)=>{
+    res.json(await Product.getCateFlow(req.params));
+});
+router.get('/flow/:flowId', async (req, res)=>{
+    res.json(await Product.getCateFlowById(req.params.flowId));
 });
 
 

@@ -34,22 +34,32 @@ class Product{
         let keyword = params.keyword || '';  // 搜尋產品名稱或者作者姓名
         let orderBy = params.orderBy || '';  // 排序
 
+        // 注意SQL空格
         let where = ' WHERE 1 ';
+
         if(cate){
+            // 分類搜尋
             where += ' AND itemCategoryId=' + cate;
         }
         if(flow){
+            // 流量搜尋
             where += ' AND itemFlowId=' + flow;
         }
         if(keyword){
+            // keyword搜尋
             let k2 = db.escape('%' + keyword + '%');
             where += ` AND (itemName LIKE ${k2} OR itemDescription LIKE ${k2}) `;
         }
         
-
+        // 排序 ORDER BY
         let orderStr = '';
         switch(orderBy){
-            case 'itemPrice':
+            case '':
+                orderStr = ' ORDER BY `itemId` ASC ';
+                break;
+            // case 'itemId':
+            //     orderStr = ' ORDER BY `itemId` ASC ';
+            //     break;
             case 'price-asc':
                 orderStr = ' ORDER BY `itemPrice` ASC ';
                 break;
@@ -65,14 +75,17 @@ class Product{
                 break;
         }
 
+        // 得到所有數量
         let t_sql = `SELECT COUNT(1) num FROM \`items\` ${where}`;
+        // 第一個結果 總共幾筆
         let [r1] = await db.query(t_sql);
         let total = r1[0]['num'];
 
+        // 第二個結果 分頁幾筆
         let r2, totalPages=0;
         if(total){
             totalPages = Math.ceil(total/perPage);
-            let r_sql = `SELECT * FROM \`items\` ${where} ${orderStr} LIMIT ${(page-1)*perPage}, ${perPage}`;
+            let r_sql = `${sqlSelect} ${where} ${orderStr} LIMIT ${(page-1)*perPage}, ${perPage}`;
             [r2] = await db.query(r_sql);
         }
         return {
@@ -85,6 +98,7 @@ class Product{
         }
     }
     
+    // 轉換資料成Product物件
     static async getItems(params={}){
         let results = await Product.getRows(params);
         if(results.data && results.data.length){
@@ -96,8 +110,6 @@ class Product{
     
     // 讀取所有
     static async getAllItems(){
-
-        
         let sql = 
         `${sqlSelect} ORDER BY \`items\`.\`itemId\``;
         let [r] = await db.query(sql);
@@ -130,11 +142,35 @@ class Product{
         }
         return r;
     }
+
+    // 列出不同分類？
+    static async getCate(categoryParentId){
+        let sql = "SELECT `items_categories`.`categoryId`, `items_categories`.`categoryName`, `cate2`.`categoryName` AS `categoryNameParent`  FROM `items_categories`LEFT JOIN `items_categories` AS`cate2`  ON `items_categories`.`categoryParentId` = `cate2`.`categoryId` WHERE `items_categories`.`categoryParentId` =?"
+
+        let [r] = await db.query(sql,[categoryParentId]);
+        if(!r || !r.length){
+            return null;
+        }
+        return r;
+    }
+
+
+
+
+
     
     // 列出流量分類
     static async getCateFlow(){
         let sql = "SELECT * FROM `items_flow`"
         let [r] = await db.query(sql);
+        if(!r || !r.length){
+            return null;
+        }
+        return r;
+    }
+    static async getCateFlowById(flowId){
+        let sql = "SELECT * FROM `items_flow` WHERE `flowId`=? "
+        let [r] = await db.query(sql,[flowId]);
         if(!r || !r.length){
             return null;
         }
