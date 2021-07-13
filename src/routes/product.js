@@ -6,9 +6,10 @@ const router = express.Router();
 
 
 // 取得所有商品 + 篩選 
-router.get('/', async (req, res)=>{
+router.post('/', async (req, res)=>{
     // res.json([req.baseUrl, req.url]);
-    res.json(await Product.getRows(req.query));
+    console.log(req.body)
+    res.json(await Product.getRows(req.body));
 });
 
 // 取得所有商品 全表完整內容
@@ -21,7 +22,6 @@ router.get('/all', async (req, res)=>{
 router.get('/ranking', async (req, res)=>{
     res.json(await Product.getTopRanking());
 });
-
 
 
 

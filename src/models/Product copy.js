@@ -78,7 +78,7 @@ class Product{
 
         // 得到所有數量
         let t_sql = `SELECT COUNT(1) num FROM \`items\` ${where}`;
-        // console.log(t_sql)
+        console.log(t_sql)
         // 第一個結果 總共幾筆
         let [r1] = await db.query(t_sql);
         let total = r1[0]['num'];
@@ -88,7 +88,7 @@ class Product{
         if(total){
             totalPages = Math.ceil(total/perPage);
             let r_sql = `${sqlSelect} ${where} ${orderStr} LIMIT ${(page-1)*perPage}, ${perPage}`;
-            // console.log(r_sql)
+            console.log(r_sql)
             [r2] = await db.query(r_sql);
         }
         return {
