@@ -5,7 +5,7 @@ const Product = require(__dirname + '/../models/Product');
 const router = express.Router();
 
 
-// 取得所有商品 + 篩選 
+// 取得所有商品 + 篩選 ***
 router.post('/', async (req, res)=>{
     // res.json([req.baseUrl, req.url]);
     console.log(req.body)
@@ -18,9 +18,9 @@ router.get('/all', async (req, res)=>{
     res.json(await Product.getAllItems());
 });
 
-// 取得所有商品
-router.get('/ranking', async (req, res)=>{
-    res.json(await Product.getTopRanking());
+// 取得評價商品
+router.get('/ranking/:itemRanking', async (req, res)=>{
+    res.json(await Product.getByRanking(req.params.itemRanking));
 });
 
 

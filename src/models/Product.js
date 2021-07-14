@@ -1,6 +1,7 @@
 const db = require('../modules/mysql2-connent')
 
 const sqlSelect = "SELECT `items`.`itemId`, `items`.`itemNo` , `items`.`itemName`, `items`.`itemCoverImg`, `items`.`itemImg`, `items`.`itemPrice`, `items`.`itemQty`, `items`.`itemDescription`, `items`.`itemCategoryId`,  `items_categories`.`categoryName`, `cate2`.`categoryId` AS `categoryIdParent`, `cate2`.`categoryName` AS `categoryNameParent`,`items`.`itemFlowId`,`items_flow`.`flowName` ,`items_flow`.`flowImg` , `items`.`itemSize`, `items`.`itemOptionId`, `items_options`.`optionName`,`items`.`itemRanking`,`items`.`created_at`,`items`.`updated_at` FROM `items` INNER JOIN  `items_categories` ON `items`.`itemCategoryId` = `items_categories`.`categoryId` LEFT JOIN `items_categories` AS `cate2` ON `items_categories`.`categoryParentId` = `cate2`.`categoryId` INNER JOIN `items_flow` ON `items`.`itemFlowId` = `items_flow`.`flowId` INNER JOIN `items_options` ON `items`.`itemOptionId` = `items_options`.`optionId`"
+const sqlFrom = "SELECT `items`.`itemId`, `items`.`itemNo` , `items`.`itemName`, `items`.`itemCoverImg`, `items`.`itemImg`, `items`.`itemPrice`, `items`.`itemQty`, `items`.`itemDescription`, `items`.`itemCategoryId`,  `items_categories`.`categoryName`, `cate2`.`categoryId` AS `categoryIdParent`, `cate2`.`categoryName` AS `categoryNameParent`,`items`.`itemFlowId`,`items_flow`.`flowName` ,`items_flow`.`flowImg` , `items`.`itemSize`, `items`.`itemOptionId`, `items_options`.`optionName`,`items`.`itemRanking`,`items`.`created_at`,`items`.`updated_at` FROM `items` INNER JOIN  `items_categories` ON `items`.`itemCategoryId` = `items_categories`.`categoryId` LEFT JOIN `items_categories` AS `cate2` ON `items_categories`.`categoryParentId` = `cate2`.`categoryId` INNER JOIN `items_flow` ON `items`.`itemFlowId` = `items_flow`.`flowId` INNER JOIN `items_options` ON `items`.`itemOptionId` = `items_options`.`optionId`"
 
 class Product{
     // `itemId`, `itemNo`, `itemName`, `itemCoverImg`, `itemImg`, `itemPrice`, `itemQty`, `itemDescription`, `itemCategoryId`, `itemCategoryChildId`, `itemFlowId`, `itemSize`, `itemOptionId`, `itemTagId`, `itemRanking`,`created_at`, `updated_at`
@@ -31,16 +32,21 @@ class Product{
         let perPage = params.perPage || 6;  // 每頁有幾筆
         let page = params.page || 1;  // 查看第幾頁
         let cate = parseInt(params.cate) || 0;  // 分類編號
+        let catePa = parseInt(params.catePa) || 0;  // 分類編號
         let flow = parseInt(params.flow) || 0;  // 流量編號
-        let keyword = params.keyword || '';  // 搜尋產品名稱或者作者姓名
+        let keyword = params.keyword || '';  // 搜尋產品名稱或者描述
         let orderBy = params.orderBy || '';  // 排序
 
         // 注意SQL空格
         let where = ' WHERE 1 ';
 
         if(cate){
-            // 分類搜尋
-            where += ' AND itemCategoryId=' + cate;
+            // 分類搜尋子層
+            where += ' AND `itemCategoryId`=' + cate;
+        }
+        if(catePa){
+            // 分類搜尋父層
+            where += ' AND `itemCategoryParentId`=' + catePa;
         }
         if(flow){
             // 流量搜尋
@@ -96,6 +102,8 @@ class Product{
             totalPages,
             perPage,
             page,
+            cate,
+            catePa,
             params,
             data: r2,
         }
@@ -177,9 +185,9 @@ class Product{
     }
 
     // 列出評價高的商品
-    static async getTopRanking(){
-        let sql = "SELECT * FROM `items` WHERE `itemRanking`=5 LIMIT 3"
-        let [r] = await db.query(sql);
+    static async getByRanking(itemRanking){
+        let sql = "SELECT * FROM `items` WHERE `itemRanking`=? LIMIT 3"
+        let [r] = await db.query(sql,[itemRanking]);
         if(!r || !r.length){
             return null;
         }
